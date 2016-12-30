@@ -14,13 +14,13 @@ var Beat = React.createClass({
 
 	getColour: function() {
 		var volume=this.props.volume;
-		if (volume == 1 || volume == 13) {
+		if (volume == 0) {
 			return 'white';
-		} else if (volume == 7 || volume == 19) {
+		} else if (volume < 26) {
 			return 'red';
-		} else if (volume == 3 || volume == 5 || volume == 15 || volume == 17) {
+		} else if (volume < 51) {
 			return 'orange';
-		} else if (volume > 0) {
+		} else if (volume < 76) {
 			return 'yellow';
 		} else {
 			return 'black';

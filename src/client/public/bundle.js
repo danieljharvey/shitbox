@@ -71,9 +71,10 @@
 	
 		getInitialState: function getInitialState() {
 			return {
-				trackNames: ['Kick', 'Snare', 'Hi-hat', 'Bing', 'Bong', 'Peeboo'],
-				pattern: [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-				current: [0, 0, 0, 0, 0, 0]
+				trackNames: ['bass.wav', 'drum1.wav', 'flat-snare.wav', 'soft.wav', 'closed-hh.wav', 'electric.wav', 'indian.wav', 'stick.wav', 'cymbal.wav', 'electro-snare.wav', 'open-hh.wav', 'wood-snare.wav'],
+				pattern: [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
+				current: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+				tempo: 120
 			};
 		},
 	
@@ -81,14 +82,7 @@
 		getCurrentNotes: function getCurrentNotes(offset) {
 			var notes = [];
 			for (var i in this.state.pattern) {
-				//var current=this.state.current[i]; // which note is currently playing
-				var current = 0;
-				if (offset > 0) {
-					current = current + offset;
-					while (current >= this.state.pattern[i].length) {
-						current = current - this.state.pattern[i].length;
-					}
-				}
+				var current = offset % this.state.pattern[i].length;
 				notes[i] = this.state.pattern[i][current];
 			}
 			return notes;
@@ -98,13 +92,7 @@
 		showCurrent: function showCurrent(offset) {
 			var current = this.state.current;
 			for (var i in this.state.pattern) {
-				var thisOne = 0;
-				if (offset > 0) {
-					thisOne = thisOne + offset;
-					while (thisOne >= this.state.pattern[i].length) {
-						thisOne = thisOne - this.state.pattern[i].length;
-					}
-				}
+				var thisOne = offset % this.state.pattern[i].length;
 				current[i] = thisOne;
 			}
 			this.setState({ 'current': current });
@@ -122,10 +110,14 @@
 		setBeatVolume: function setBeatVolume(rowID, beatID) {
 			var pattern = this.state.pattern;
 			var volume = pattern[rowID][beatID];
-			volume = volume + 1;
-			if (volume > 24) volume = 0;
+			volume = volume + 25;
+			if (volume > 100) volume = 0;
 			pattern[rowID][beatID] = volume;
 			this.setState({ 'pattern': pattern });
+		},
+	
+		setTempo: function setTempo(tempo) {
+			this.setState({ 'tempo': tempo });
 		},
 	
 		increaseRow: function increaseRow(rowID) {
@@ -153,9 +145,11 @@
 				'div',
 				null,
 				_react2.default.createElement(_Clock2.default, {
-					tempo: '60',
+					tempo: this.state.tempo,
 					showCurrent: this.showCurrent,
-					getCurrentNotes: this.getCurrentNotes
+					getCurrentNotes: this.getCurrentNotes,
+					trackNames: this.state.trackNames,
+					setTempo: this.setTempo
 				}),
 				_react2.default.createElement(_Grid2.default, {
 					trackNames: this.state.trackNames,
@@ -22252,13 +22246,13 @@
 	
 		getColour: function getColour() {
 			var volume = this.props.volume;
-			if (volume == 1 || volume == 13) {
+			if (volume == 0) {
 				return 'white';
-			} else if (volume == 7 || volume == 19) {
+			} else if (volume < 26) {
 				return 'red';
-			} else if (volume == 3 || volume == 5 || volume == 15 || volume == 17) {
+			} else if (volume < 51) {
 				return 'orange';
-			} else if (volume > 0) {
+			} else if (volume < 76) {
 				return 'yellow';
 			} else {
 				return 'black';
@@ -22385,6 +22379,10 @@
 	
 	var _reactDom = __webpack_require__(/*! react-dom */ 34);
 	
+	var _Tempo = __webpack_require__(/*! ./Tempo.jsx */ 177);
+	
+	var _Tempo2 = _interopRequireDefault(_Tempo);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var Clock = _react2.default.createClass({
@@ -22397,10 +22395,11 @@
 				notesInQueue: [],
 				timer: null,
 				audioContext: null,
+				audioPlayer: null,
 				noteNumber: 0, // current note we've scheduled
 				showNoteNumber: 0, // current note we can see
 				multiple: 1.0594630944,
-				scheduleAheadTime: 200
+				scheduleAheadTime: 100
 			};
 		},
 	
@@ -22446,16 +22445,18 @@
 			var oscs = [];
 			for (var i in allNotes) {
 				if (allNotes[i] > 0) {
-					//console.log('create a note for '+i);
-					var freq = this.getFrequency(allNotes[i]);
-					// create an oscillator
-					oscs[i] = this.state.audioContext.createOscillator();
-					oscs[i].connect(this.state.audioContext.destination);
-					oscs[i].frequency.value = freq;
-					oscs[i].type = 'sawtooth';
+					var bufferName = this.props.trackNames[i];
+					this.state.audioPlayer.playSound(bufferName, allNotes[i], time, this.state.audioContext);
 	
-					oscs[i].start(time);
-					oscs[i].stop(time + 0.1);
+					/*
+	    var freq=this.getFrequency(allNotes[i]);
+	    // create an oscillator
+	    oscs[i] = this.state.audioContext.createOscillator();
+	    oscs[i].connect( this.state.audioContext.destination );
+	    oscs[i].frequency.value = freq;
+	    oscs[i].type='sawtooth';
+	    	oscs[i].start( time );
+	    oscs[i].stop( time + 0.1 );*/
 				}
 			}
 	
@@ -22514,7 +22515,11 @@
 	
 		componentDidMount: function componentDidMount() {
 			var audioContext = new AudioContext();
-			this.setState({ 'audioContext': audioContext });
+			var audioPlayer = new AudioPlayer();
+			for (var i in this.props.trackNames) {
+				audioPlayer.loadSample(this.props.trackNames[i], audioContext);
+			}
+			this.setState({ 'audioPlayer': audioPlayer, 'audioContext': audioContext });
 		},
 	
 	
@@ -22535,12 +22540,88 @@
 			return _react2.default.createElement(
 				'div',
 				null,
-				button
+				button,
+				_react2.default.createElement(_Tempo2.default, { tempo: this.props.tempo, setTempo: this.props.setTempo })
 			);
 		}
 	});
 	
 	exports.default = Clock;
+
+/***/ },
+/* 177 */
+/*!**********************************!*\
+  !*** ./src/client/app/Tempo.jsx ***!
+  \**********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _reactDom = __webpack_require__(/*! react-dom */ 34);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Tempo = _react2.default.createClass({
+		displayName: 'Tempo',
+	
+		getDefaultProps: function getDefaultProps() {
+			return {
+				tempo: 120
+			};
+		},
+	
+		increase: function increase() {
+			var tempo = this.props.tempo;
+			if (tempo < 240) {
+				tempo++;
+			}
+			console.log(tempo);
+			this.props.setTempo(tempo);
+		},
+	
+		decrease: function decrease() {
+			var tempo = this.props.tempo;
+			if (tempo > 20) {
+				tempo--;
+			}
+			console.log(tempo);
+			this.props.setTempo(tempo);
+		},
+	
+		render: function render() {
+			return _react2.default.createElement(
+				'div',
+				null,
+				_react2.default.createElement(
+					'button',
+					{ onClick: this.decrease },
+					'-'
+				),
+				_react2.default.createElement(
+					'span',
+					null,
+					this.props.tempo,
+					' bpm'
+				),
+				_react2.default.createElement(
+					'button',
+					{ onClick: this.increase },
+					'+'
+				)
+			);
+		}
+	
+	});
+	
+	exports.default = Tempo;
 
 /***/ }
 /******/ ]);

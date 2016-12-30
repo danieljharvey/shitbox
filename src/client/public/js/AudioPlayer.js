@@ -1,40 +1,43 @@
 function AudioPlayer() {
   var self=this;
-  this.myBuffer=false;
-  this.context=false;
+  this.buffers=[]
 
-  this.loadSamples=function() {
-    window.AudioContext = window.AudioContext || window.webkitAudioContext;
-    this.context = new AudioContext();
+  this.loadSample=function(name, audioContext) {
 
     var request = new XMLHttpRequest();
 
-    request.open('GET', '/audio/bass.wav', true);
+    request.open('GET', '/audio/'+name, true);
 
     request.responseType = 'arraybuffer';
 
     // Decode asynchronously
     request.onload = function() {
-      self.context.decodeAudioData(request.response, function(theBuffer) {
-        self.myBuffer = theBuffer;
-        self.playSound(self.myBuffer);
+      audioContext.decodeAudioData(request.response, function(theBuffer) {
+        self.buffers[name] = theBuffer;
+        console.log('loaded '+name);
       }, self.loadError);
     }
     request.send();
   }
 
 
-  this.playSound=function(buffer) {
-    var source = this.context.createBufferSource(), g = this.context.createGain();
+  this.playSound=function(bufferName,volume,time,audioContext) {
+    var buffer=this.buffers[bufferName];
+    if (!buffer) {
+      return false; // sound not loaded yet
+    }
+    var source = audioContext.createBufferSource();
+    var g = audioContext.createGain();
     source.buffer = buffer;
-    source.start(0);
-    g.gain.value = 0.5;
+    source.start(time); // schedule at time
+    g.gain.value = volume/100;
     source.connect(g);
-    g.connect(this.context.destination);
+    g.connect(audioContext.destination);
   }
 
   this.loadError=function(error) {
     console.log(error);
   }
 
+  //this.constructor(); // get audio context
 }

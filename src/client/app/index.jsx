@@ -9,24 +9,37 @@ var App = React.createClass({
 	getInitialState: function() {
 		return {
 			trackNames:[
-				'Kick',
-				'Snare',
-				'Hi-hat',
-				'Bing',
-				'Bong',
-				'Peeboo'
+				'bass.wav',
+				'drum1.wav',
+				'flat-snare.wav',
+				'soft.wav',
+				'closed-hh.wav',
+				'electric.wav',
+				'indian.wav',
+				'stick.wav',
+				'cymbal.wav',
+				'electro-snare.wav',
+				'open-hh.wav',
+				'wood-snare.wav'
 			],
 			pattern:[
-				[0,0,0,0,0,0,0,0],
-				[0,0,0,0,0,0,0],
-				[0,0,0,0,0,0],
-				[0,0,0,0,0],
-				[0,0,0,0],
-				[0,0,0,0,0,0,0,0,0,0]
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 			],
 			current:[
-				0,0,0,0,0,0
-			]
+				0,0,0,0,0,0,0,0,0,0,0,0
+			],
+			tempo:120
 		}
 	},
 
@@ -34,14 +47,7 @@ var App = React.createClass({
 	getCurrentNotes:function(offset) {
 		var notes=[];
 		for (var i in this.state.pattern) {
-			//var current=this.state.current[i]; // which note is currently playing
-			var current=0;
-			if (offset>0) {
-				current=current+offset;
-				while (current >= this.state.pattern[i].length) {
-					current=current-this.state.pattern[i].length;
-				}
-			}
+			var current=(offset % this.state.pattern[i].length);
 			notes[i]=this.state.pattern[i][current];
 		}
 		return notes;
@@ -51,13 +57,7 @@ var App = React.createClass({
 	showCurrent:function(offset) {
 		var current=this.state.current;
 		for (var i in this.state.pattern) {
-			var thisOne=0;
-			if (offset>0) {
-				thisOne=thisOne+offset;
-				while (thisOne >= this.state.pattern[i].length) {
-					thisOne=thisOne-this.state.pattern[i].length;
-				}
-			}
+			var thisOne=(offset % this.state.pattern[i].length);
 			current[i]=thisOne;
 		}
 		this.setState({'current':current});
@@ -75,10 +75,14 @@ var App = React.createClass({
 	setBeatVolume: function(rowID,beatID) {
 		var pattern=this.state.pattern;
 		var volume=pattern[rowID][beatID];
-		volume=volume+1;
-		if (volume>24) volume=0;
+		volume=volume+25;
+		if (volume>100) volume=0;
 		pattern[rowID][beatID]=volume;
 		this.setState({'pattern':pattern});
+	},
+
+	setTempo: function(tempo) {
+		this.setState({'tempo':tempo});
 	},
 
 	increaseRow: function(rowID) {
@@ -105,9 +109,11 @@ var App = React.createClass({
 		return (
 			<div>
 				<Clock
-					tempo="60"
+					tempo={this.state.tempo}
 					showCurrent={this.showCurrent}
 					getCurrentNotes={this.getCurrentNotes}
+					trackNames={this.state.trackNames}
+					setTempo={this.setTempo}
 				/>
 				<Grid
 					trackNames={this.state.trackNames}

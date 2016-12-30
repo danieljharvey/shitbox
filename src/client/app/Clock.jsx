@@ -1,6 +1,8 @@
 import React from 'react';
 import {render} from 'react-dom';
 
+import Tempo from './Tempo.jsx';
+
 var Clock = React.createClass({
 	getInitialState: function () {
 		return {
@@ -9,10 +11,11 @@ var Clock = React.createClass({
 			notesInQueue:[],
 			timer:null,
 			audioContext:null,
+			audioPlayer:null,
 			noteNumber:0, // current note we've scheduled
 			showNoteNumber:0,  // current note we can see
 			multiple:1.0594630944,
-			scheduleAheadTime:200
+			scheduleAheadTime:100
 		};
 	},
 
@@ -58,7 +61,10 @@ var Clock = React.createClass({
 		var oscs=[];
 		for (var i in allNotes) {
 			if (allNotes[i]>0) {
-				//console.log('create a note for '+i);
+				var bufferName=this.props.trackNames[i];
+				this.state.audioPlayer.playSound(bufferName,allNotes[i],time,this.state.audioContext);
+
+				/*
 				var freq=this.getFrequency(allNotes[i]);
 				// create an oscillator
 				oscs[i] = this.state.audioContext.createOscillator();
@@ -67,7 +73,7 @@ var Clock = React.createClass({
 				oscs[i].type='sawtooth';
 
 				oscs[i].start( time );
-				oscs[i].stop( time + 0.1 );
+				oscs[i].stop( time + 0.1 );*/
 			}
 		}
 
@@ -126,7 +132,11 @@ var Clock = React.createClass({
 
 	componentDidMount() {
 		var audioContext=new AudioContext();
-		this.setState({'audioContext':audioContext});
+		var audioPlayer= new AudioPlayer();
+		for (var i in this.props.trackNames) {
+			audioPlayer.loadSample(this.props.trackNames[i],audioContext);
+		}
+		this.setState({'audioPlayer':audioPlayer,'audioContext':audioContext});
 	},
 
   render: function() {
@@ -140,7 +150,10 @@ var Clock = React.createClass({
 			);
 		}
 		return (
-			<div>{button}</div>
+			<div>
+				{button}
+				<Tempo tempo={this.props.tempo} setTempo={this.props.setTempo} />
+			</div>
 		);
   }
 });
